@@ -501,6 +501,14 @@ export function getAllRootHeading(doc: TextDocument, respectMagicCommentOmit: bo
      * @param foundStr The multiline string.
      */
     const replacer = (foundStr: string) => foundStr.replace(/[^\r\n]/g, '');
+    const hexoReplacer = (foundStr: string) => {
+        let replacedStr = ""
+        let title = foundStr.match(/^title: .+/)
+        if (title)
+            replacedStr = title[0].replace("title:", "#")
+        foundStr.replace(/[^\r\n]/g, "");
+        return replacedStr + foundStr;
+    };
 
     /*
      * Text normalization
@@ -518,7 +526,7 @@ export function getAllRootHeading(doc: TextDocument, respectMagicCommentOmit: bo
 
     // (easy)
     const lines: string[] = doc.getText()
-        .replace(/^---.+?(?:\r?\n)---(?=[ \t]*\r?\n)/s, replacer) //// Remove YAML front matter
+        .replace(/^---.+?(?:\r?\n)---(?=[ \t]*\r?\n)/s, hexoReplacer) //// Remove YAML front matter
         .replace(/^\t+/gm, (match: string) => '    '.repeat(match.length)) // <https://spec.commonmark.org/0.29/#tabs>
         .replace(/^( {0,3})<!--([^]*?)-->.*$/gm, (match: string, leading: string, content: string) => {
             // Remove HTML block comment, together with all the text in the lines it occupies. <https://spec.commonmark.org/0.29/#html-blocks>
